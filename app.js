@@ -68,16 +68,12 @@ const serve = http.createServer((req, res) => {
       urlObj.query.id = list.length + 1;
       list.push(urlObj.query);
 
-      fs.writeFile(path.join(__dirname, 'data', 'data.json'), JSON.stringify(list), (err) => {
-        if (err) {
-          throw err;
-        } else {
-          // 重定向
-          res.statusCode = 302;
-          res.statusMessage = 'Found';
-          res.setHeader('Location', '/');
-          res.end();
-        }
+      writeNewsData(JSON.stringify(list), () => {
+        // 重定向
+        res.statusCode = 302;
+        res.statusMessage = 'Found';
+        res.setHeader('Location', '/');
+        res.end();
       })
     })
   } else if (req.url === "/add" && req.method === "post") {
@@ -94,17 +90,12 @@ const serve = http.createServer((req, res) => {
 
         list.push(postBody);
 
-        fs.writeFile(path.join(__dirname, 'data', 'data.json'), JSON.stringify(list), (err) => {
-          if (err) {
-            throw err;
-          } else {
-            res.statusCode = 302;
-            res.statusMessage = 'Found';
-            res.setHeader('Location', '/');
-            res.end();
-          }
+        writeNewsData(JSON.stringify(list), () => {
+          res.statusCode = 302;
+          res.statusMessage = 'Found';
+          res.setHeader('Location', '/');
+          res.end();
         })
-
       })
     })
   } else if (req.url.startsWith('/resources')) {
@@ -127,5 +118,15 @@ function readNewsData(callback) {
     }
     let list = JSON.parse(data || '[]');
     callback(list);
+  })
+}
+
+function writeNewsData(data, callback) {
+  fs.writeFile(path.join(__dirname, 'data', 'data.json'), data, (err) => {
+    if (err) {
+      throw err;
+    } else {
+      callback();
+    }
   })
 }
