@@ -78,16 +78,8 @@ const serve = http.createServer((req, res) => {
     })
   } else if (req.url === "/add" && req.method === "post") {
     readNewsData((list) => {
-      let arr = [];
-      req.on('data', chunk => {
-        arr.push(chunk);
-      })
-      req.on('end', () => {
-        let postBody = Buffer.concat(arr);
-        postBody = postBody.toString();
-        postBody = querystring.parse(postBody);
+      postNewsData(req, (postBody) => {
         postBody.id = (list.length + 1);
-
         list.push(postBody);
 
         writeNewsData(JSON.stringify(list), () => {
@@ -128,5 +120,18 @@ function writeNewsData(data, callback) {
     } else {
       callback();
     }
+  })
+}
+
+function postNewsData(req, callback) {
+  let arr = [];
+  req.on('data', chunk => {
+    arr.push(chunk);
+  })
+  req.on('end', () => {
+    let postBody = Buffer.concat(arr);
+    postBody = postBody.toString();
+    postBody = querystring.parse(postBody);
+    callback(postBody);
   })
 }
