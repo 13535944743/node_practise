@@ -2,10 +2,12 @@ const fs = require("fs");
 const path = require("path");
 const querystring = require('querystring');
 
+const config = require('./config.js');
+
 module.exports.index = (req, res) => {
   // 读data.json文件
   readNewsData((list) => {
-    res.render(path.join(__dirname, 'views', 'index.html'), {
+    res.render(path.join(config.viewPath, 'index.html'), {
       list: list
     });
   })
@@ -21,17 +23,17 @@ module.exports.details = (req, res) => {
       }
     }
     if (model) {
-      res.render(path.join(__dirname, 'views', 'details.html'), {
+      res.render(path.join(config.viewPath, 'details.html'), {
         item: model
       })
     } else {
-      res.render(path.join(__dirname, 'views', 'details.html'));
+      res.render(path.join(config.viewPath, 'details.html'));
     }
   })
 };
 
 module.exports.submit = (req, res) => {
-  res.render(path.join(__dirname, "views", "submit.html"));
+  res.render(path.join(config.viewPath, "submit.html"));
 };
 
 module.exports.addGet = (req, res) => {
@@ -77,7 +79,7 @@ module.exports.notFound = (req, res) => {
 }
 
 function readNewsData(callback) {
-  fs.readFile(path.join(__dirname, 'data', 'data.json'), 'utf8', (err, data) => {
+  fs.readFile(config.dataPath, 'utf8', (err, data) => {
     if (err && err.code !== 'ENOENT') {
       throw err;
     }
@@ -87,7 +89,7 @@ function readNewsData(callback) {
 }
 
 function writeNewsData(data, callback) {
-  fs.writeFile(path.join(__dirname, 'data', 'data.json'), data, (err) => {
+  fs.writeFile(config.dataPath, data, (err) => {
     if (err) {
       throw err;
     } else {
